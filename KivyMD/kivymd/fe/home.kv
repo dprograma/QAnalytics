@@ -1,0 +1,35 @@
+#:kivy 1.0.0  
+#:include fe/auth.kv
+<HomeScreen>:
+    FloatLayout:
+        id: outer_box
+        size: root.width, root.height
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/home.jpg'                   
+        FloatLayout: 
+            size: root.width, root.height
+            MDRectangleFlatButton:
+                text: "SIGN IN"
+                id: inner-box
+                pos_hint: {"x": .7, "y": .9}
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, .9
+                line_color: 1, 1, 1, .9
+                theme_icon_color: "Custom"
+                on_release: app.root.current = "signin"
+
+            MDRectangleFlatButton:
+                text: "SIGN UP"
+                id: inner-box
+                pos_hint: {"x": .82, "y": .9}
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, .9
+                line_color: 1, 1, 1, .9
+                theme_icon_color: "Custom"
+                on_release: app.root.current = "signup"
+        
+
+     

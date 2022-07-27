@@ -1,0 +1,412 @@
+#:kivy 1.0.0  
+#:import os os
+AuthManager:
+    id: auth_manager
+    HomeScreen:
+    SignInScreen:
+    SignUpScreen:
+    UserDashboard:
+    ForgotPassScreen:
+    
+<HomeScreen>:
+    name: "home"
+    FloatLayout:
+        id: outer_box
+        size: root.width, root.height
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/home.jpg'                   
+        FloatLayout: 
+            id: buttons_labels
+            size: root.width, root.height
+            MDCard:
+                pos_hint: {"center_x": .75  , "center_y": .9}
+                size_hint: None, None
+                size: "250dp", "40dp"
+                padding: 20
+                spacing: 20
+                md_bg_color: 0, 0, 0, 0
+                MDRectangleFlatButton:
+                    text: "       SIGN IN       "
+                    id: signin-box
+                    theme_text_color: "Custom"
+                    text_color: 1, 1, 1, .9
+                    line_color: 1, 1, 1, .9
+                    theme_icon_color: "Custom"
+                    on_release: 
+                        app.root.current = "signin"
+                        root.manager.transition.direction = "left"
+
+                MDRectangleFlatButton:
+                    text: "       SIGN UP       "
+                    id: signup-box
+                    theme_text_color: "Custom"
+                    text_color: 1, 1, 1, .9
+                    line_color: 1, 1, 1, .9
+                    theme_icon_color: "Custom"
+                    on_release: 
+                        app.root.current = "signup"
+                        root.manager.transition.direction = "left"
+            
+            MDLabel:
+                text: '  QAnalytics'
+                bold: True
+                font_size: '50sp'
+                font_name: 'fonts/AquireBold-8Ma60.otf'
+                color: 1,1,1, .7     
+                halign: 'left'  
+                pos_hint: {"center_y": .7}
+            MDLabel:
+                text: "QAnalytics"
+                bold: False
+                font_size: '15sp'
+                font_name: 'fonts/AquireBold-8Ma60.otf'
+                color: 1,1,1, .8     
+                halign: 'left'  
+                pos_hint: {"center_x": .57, "center_y": .4}
+            
+            MDLabel:
+                text: 
+                    '''Lorem ipsum dolor sit amet consectetur nadipisicing elit.\nMaxime mollitia, molestiae quas vel sint commodi\nrepudiandae consequuntur voluptatum laborum\nnumquam blanditiis harum quisquam eius sed odit fugiat\niusto fuga praesentium optio, eaque rerum! Provident\nsimilique accusantium nemo autem. Veritatis aliquid.
+                    '''
+                bold: False
+                font_size: '12sp'
+                font_name: 'fonts/Roboto-regular.ttf'
+                color: 1,1,1, .8     
+                halign: 'left'  
+                pos_hint: {"center_x": .57, "center_y": .3}    
+
+<SignInScreen>:
+    name: "signin"
+    size: root.width, root.height
+    FloatLayout:
+        id: outer_box
+        size: root.width, root.height
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/home.jpg' 
+        FloatLayout:
+            MDIconButton:
+                icon: "arrow-left-bold"
+                pos_hint: {"x": .01, "top": .98}
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+                md_bg_color: 0,0,0,0
+                on_release: 
+                    app.root.current = "home"
+                    root.manager.transition.direction = "right"
+        MDCard:
+            id: signin_card
+            pos_hint: {"center_x": .5, "center_y": .5}
+            size_hint: (.6, .65)
+            padding: 40
+            spacing: 20
+            orientation: "vertical"
+            MDLabel:
+                id: signin_label
+                text: "LOGIN TO ACCOUNT"
+                font_size: 22
+                halign: "center"
+            MDLabel:
+                id: login_errors
+                text: ""
+                font_size: 15
+                halign: "center"
+            MDTextField:
+                id: signin_field
+                hint_text: "Email"
+                icon_right: "account"
+                helper_text: "There will always be an email"
+                helper_text_mode: "on_error"
+                pos_hint: {"center_x": .5}
+            MDTextField:
+                id: pwd_field
+                hint_text: "Password"
+                icon_right: "eye-off"
+                helper_text: "There will always a password"
+                helper_text_mode: "on_error"
+                pos_hint: {"center_x": .5}
+                password: True
+            MDFlatButton:
+                id: signin_button
+                font_size: 20
+                text: "      Sign In      "
+                pos_hint: {"center_x": .5}
+                md_bg_color: 36/255, 40/255, 43/255, 1
+                on_press:
+                    app.signin()
+            BoxLayout:
+                orientation: "horizontal"
+                Button:
+                    id: signed_up
+                    font_size: 12
+                    text: "Forgot password?"
+                    color: 19/255, 122/255, 150/255, 1
+                    background_color:  0,0,0,0
+                    on_release:
+                        app.root.current = "forgot_password"
+
+                Button:
+                    id: forgot_password
+                    font_size: 12
+                    text: "Create a new account"
+                    color: 19/255, 122/255, 150/255, 1
+                    background_color: 0,0,0,0
+                    on_release:
+                        app.root.current = "signup"
+
+<SignUpScreen>:
+    name: "signup"
+    size: root.width, root.height
+    FloatLayout:
+        id: signedup_box
+        size: root.width, root.height
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/home.jpg' 
+        FloatLayout:
+            MDIconButton:
+                icon: "arrow-left-bold"
+                pos_hint: {"x": .01, "top": .98}
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+                md_bg_color: 0,0,0,0
+                on_release: 
+                    app.root.current = "home"
+                    root.manager.transition.direction = "right"
+        
+        MDCard:
+            id: signup_card
+            pos_hint: {"center_x": .5, "center_y": .5}
+            size_hint: (.6, .72)
+            padding: 40
+            spacing: 20
+            orientation: "vertical"
+            MDLabel:
+                id: signup_label
+                text: "CREATE A NEW ACCOUNT"
+                font_size: 22
+                halign: "center"
+            MDLabel:
+                id: errors
+                text: ""
+                font_size: 15
+                halign: "center"
+            MDTextField:
+                id: signup_field
+                hint_text: "Email"
+                icon_right: "account"
+                helper_text: "There will always be an email"
+                helper_text_mode: "on_error"
+                pos_hint: {"center_x": .5}
+            MDTextField:
+                id: signuppwd_field
+                hint_text: "Password"
+                icon_right: "eye-off"
+                helper_text: "There will always a password"
+                helper_text_mode: "on_error"
+                pos_hint: {"center_x": .5}
+                password: True
+            MDTextField:
+                id: signup_conf_field
+                hint_text: "Confirm Password"
+                icon_right: "eye-off"
+                helper_text: "There will always a password"
+                helper_text_mode: "on_error"
+                pos_hint: {"center_x": .5}
+                password: True
+            MDFlatButton:
+                id: signup_button
+                font_size: 20
+                text: "      Sign Up      "
+                pos_hint: {"center_x": .5}
+                md_bg_color: 36/255, 40/255, 43/255, 1
+                on_release: 
+                    app.signup()
+            BoxLayout:
+                orientation: "horizontal"
+                Button:
+                    id: signed_in
+                    font_size: 12
+                    text: "Already a user? Login"
+                    color: 19/255, 122/255, 150/255, 1
+                    background_color: 0,0,0,0
+                    on_release:
+                        app.root.current = "signin"
+
+<UserDashboard>:
+    name: "dashboard"
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDToolbar:
+            title: "QAnalytics Dashboard"
+            md_bg_color: 0, 0, 0, .5
+            elevation: 10
+            left_action_items: [['menu', lambda x: nav_drawer.set_state('toggle')]]
+
+        ScreenManager:
+            id: screen_manager
+            Screen: 
+                name: "my_dashboard"
+                BoxLayout:
+                    orientation: "vertical"
+                    Button:
+                        text: "My Dashboard"
+                        
+            Screen:
+                name: "my_files"
+                BoxLayout:
+                    orientation: "vertical"
+                    padding: 50
+                    FileChooserIconView:
+                        rootpath: 'excelfiles'  
+            Screen:
+                name: "recents"
+                BoxLayout:
+                    orientation: "vertical"
+                    padding: 50
+                    FileChooserIconView:
+                        rootpath: 'excelfiles' 
+
+            Screen:
+                name: "upload_from_csv"
+                BoxLayout:
+                    orientation: "vertical"
+                    padding: 50
+                    FileChooserIconView:
+                        id: csv_file_chooser
+                        rootpath: os.path.expanduser('~')
+                        on_selection:
+                            app.showdataframe(csv_file_chooser.selection)
+
+            Screen:
+                name: "display_graph"
+                BoxLayout:
+                    orientation: "vertical"
+                    
+
+    MDNavigationDrawer:
+        id: nav_drawer
+        BoxLayout:
+            text: "QAnalytics Dashboard"
+            orientation: 'vertical'
+            spacing: '8dp'
+            padding: '8dp'
+            
+            Image:
+                source: 'images/firebase-logo.png'
+            MDLabel:
+                text: 'Kennedy Egwuda'
+                font_style: 'Subtitle1'
+                size_hint_y: None
+                height: self.texture_size[1]
+                
+            MDLabel: 
+                text: 'Software Engineer'
+                font_style: 'Caption'
+                size_hint_y: None
+                height: self.texture_size[1]
+            
+            ScrollView:
+                spacing: '0dp'
+                padding: '0dp'
+                MDList:
+                    OneLineListItem:
+                        text: '         My Dashboard'
+                        on_press: 
+                            screen_manager.current = "my_dashboard"
+                        IconLeftWidget:
+                            icon: 'view-dashboard'
+                    OneLineListItem:
+                        text: '         My Files'
+                        on_press: 
+                            screen_manager.current = "my_files"
+                        IconLeftWidget:
+                            icon: 'file'
+
+                    OneLineListItem: 
+                        text: '         Recent'
+                        on_press: 
+                            screen_manager.current = "recents"
+                        IconLeftWidget:
+                            icon: 'history'
+                    OneLineListItem:
+                        text: '         Upload From CSV'
+                        on_press: 
+                            screen_manager.current = "upload_from_csv"
+                        IconLeftWidget:
+                            icon: 'upload'
+                    # OneLineListItem:
+                    #     text: '         Upload From Tableau Server'
+                    #     on_press: 
+                    #         screen_manager.current = "upload_from_tableau"
+                    #     IconLeftWidget:
+                    #         icon: 'cloud-upload'
+                    OneLineListItem:
+                        text: '         Logout'
+                        on_press: app.logout()
+                        IconLeftWidget:
+                            icon: 'logout'
+           
+<ForgotPassScreen>:
+    name: "forgot_password"
+    size: root.width, root.height
+    FloatLayout:
+        id: forgotpass_box
+        size: root.width, root.height
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'images/home.jpg' 
+        FloatLayout:
+            MDIconButton:
+                icon: "arrow-left-bold"
+                pos_hint: {"x": .01, "top": .98}
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+                md_bg_color: 0,0,0,0
+                on_release: 
+                    app.root.current = "signin"
+                    root.manager.transition.direction = "right"
+        MDCard:
+            id: forgotpass_card
+            pos_hint: {"center_x": .5, "center_y": .5}
+            size_hint: (.6, .6)
+            padding: 40
+            spacing: 20
+            orientation: "vertical"
+            MDLabel:
+                id: forgotpass_label
+                text: "FORGOT PASSWORD"
+                font_size: 22
+                halign: "center"
+            MDLabel:
+                id: forgotpass_errors
+                text: ""
+                font_size: 15
+                halign: "center"
+            MDTextField:
+                id: forgotpass_field
+                hint_text: "Enter your email here"
+                icon_right: "account"
+                helper_text: "There will always be an email"
+                helper_text_mode: "on_error"
+                pos_hint: {"center_x": .5}
+            MDFlatButton:
+                id: forgotpass_button
+                font_size: 20
+                text: "      Submit Password      "
+                pos_hint: {"center_x": .5}
+                md_bg_color: 36/255, 40/255, 43/255, 1
+                on_press:
+                    app.signin()
+            Widget:
+            
