@@ -1,5 +1,7 @@
 #:kivy 1.0.0  
 #:import os os
+#:import Window kivy.core.window.Window
+#:import shelve shelve
 AuthManager:
     id: auth_manager
     HomeScreen:
@@ -138,7 +140,7 @@ AuthManager:
                 pos_hint: {"center_x": .5}
                 md_bg_color: 36/255, 40/255, 43/255, 1
                 on_press:
-                    app.signin()
+                    app.signin_thread()
             BoxLayout:
                 orientation: "horizontal"
                 Button:
@@ -255,18 +257,69 @@ AuthManager:
             id: screen_manager
             Screen: 
                 name: "my_dashboard"
-                BoxLayout:
-                    orientation: "vertical"
-                    Button:
-                        text: "My Dashboard"
-                        
+                TabbedPanel:
+                    do_default_tab: False
+                    tab_width: self.parent.width / 4
+                    background_color: (0, 0, 0, .8)
+                    TabbedPanelItem:
+                        text: "Home"
+                        id: home_tab
+                        BoxLayout:
+                            orientation:'vertical'
+                            id: dashboard_home_screen
+                            # Label:
+                            #     id: home_label
+                            #     text: "User Dashboard"
+                            # Button:
+                            #     text: "Go to Profile"
+                            #     halign: "center"
+                            #     size_hint: {.4, .12}
+                    TabbedPanelItem:
+                        text: "User Profile"
+                        BoxLayout:
+                            orientation:'vertical'
+                            Label:
+                                id: profile_label
+                                text: "View your details"
+                            Button:
+                                text: "See More"
+                                halign: "center"
+                                size_hint: {.4, .12}
+                    TabbedPanelItem:
+                        text: "Learn About QAnalytics"
+                        BoxLayout:
+                            orientation:'vertical'
+                            Label:
+                                id: about_label
+                                text: "About Us"
+                            Button:
+                                text: "See More"
+                                halign: "center"
+                                size_hint: {.4, .12}
+                    TabbedPanelItem:
+                        text: "Settings"
+                        BoxLayout:
+                            orientation:'vertical'
+                            Label:
+                                id: about_label
+                                text: "Settings"
+                                size_hint: (1, .88)
+
+                            Button:
+                                text: "See Settings" 
+                                halign: "center"
+                                size_hint: {.4, .12}                      
             Screen:
                 name: "my_files"
                 BoxLayout:
                     orientation: "vertical"
                     padding: 50
                     FileChooserIconView:
+                        id: load_all_my_files
                         rootpath: 'excelfiles'  
+                        # on_selection:
+                        #     app.showallfiles
+
             Screen:
                 name: "recents"
                 BoxLayout:
@@ -278,19 +331,35 @@ AuthManager:
             Screen:
                 name: "upload_from_csv"
                 BoxLayout:
+                    id: filechooser_lyt
                     orientation: "vertical"
                     padding: 50
                     FileChooserIconView:
                         id: csv_file_chooser
                         rootpath: os.path.expanduser('~')
                         on_selection:
-                            app.showdataframe(csv_file_chooser.selection)
+                            app.showdataframe_thread(csv_file_chooser.selection)
 
             Screen:
                 name: "display_graph"
-                BoxLayout:
-                    orientation: "vertical"
-                    
+                # BoxLayout:
+                #     orientation: "vertical"
+                TabbedPanel:
+                    do_default_tab: False
+                    tab_width: self.parent.width / 2
+                    background_color: (0, 0, 0, .8)
+                    TabbedPanelItem:
+                        text: "Forecasted Dataframe"
+                        id: original_dataframe
+                        BoxLayout:
+                            orientation:'vertical'
+                            id: original_dataframe_screen
+                    TabbedPanelItem:
+                        text: "Prediction result"     
+                        id: prediction_result
+                        BoxLayout:
+                            orientation:'vertical'
+                            id: prediction_result_screen               
 
     MDNavigationDrawer:
         id: nav_drawer
@@ -303,6 +372,7 @@ AuthManager:
             Image:
                 source: 'images/firebase-logo.png'
             MDLabel:
+                id: user_name_label
                 text: 'Kennedy Egwuda'
                 font_style: 'Subtitle1'
                 size_hint_y: None
@@ -328,6 +398,7 @@ AuthManager:
                         text: '         My Files'
                         on_press: 
                             screen_manager.current = "my_files"
+                            # app.showallfiles()
                         IconLeftWidget:
                             icon: 'file'
 

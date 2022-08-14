@@ -52,8 +52,3 @@ class SendMail:
             server.login(sender_email, password)
             server.sendmail(sender_email, receiver_email, message.as_string())
         
-# to = 'ketuojoken@gmail.com'
-# subject = 'Account Creation for QAnalytics'
-# msg = 'Create a new account for QAnalytics'
-# alt = 'Alternative message for QAnalytics'
-# SendMail(to, subject, msg, alt)
