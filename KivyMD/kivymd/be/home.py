@@ -395,6 +395,8 @@ class MainApp(MDApp):
 
     def showdataframe_thread(self, filename):
         dashbd = MainApp.get_running_app().root.get_screen('dashboard')
+        if dashbd.ids.filechooser_lyt:
+            dashbd.ids.filechooser_lyt.clear_widgets()
         self.filechoosermsg = MDLabel(text="Please wait while loading the file...", font_size="12sp", pos_hint={"x":.3, "y":.4})
         dashbd.ids['filechooser_msg'] = weakref.ref(self.filechoosermsg)
         dashbd.ids.filechooser_lyt.add_widget(self.filechoosermsg)
@@ -419,7 +421,7 @@ class MainApp(MDApp):
                 read_file.to_csv(fr'{csv_path}', index=None, header=True)
 
                 # read csv file and convert into a dataframe object
-                df = pd.DataFrame(pd.read_csv(fr'{csv_path}', header=10))
+                df = pd.DataFrame(pd.read_csv(fr'{csv_path}', header=1))
                 # get column header names
                 new_headers = ['Stnno', 'Year', 'Month', 'Day', 'Hour (MST)', 'Pressure MSL (Hpa)', 'Dry Bulb Temp. (⁰ C)', 'Dew Point (⁰ C)', 'Relative Humidity (%)', 'Mean Surface Direction (⁰)', 'Wind Speed (m/s)', 'Rainfall Duration (m/s)', 'Rainfall Amount (mm)', 'Amount ( mm )', 'Rain Intensity (mm/hr)']
 
@@ -427,6 +429,7 @@ class MainApp(MDApp):
                 df.columns = new_headers
                 col = list(df.columns)
                 row = df.to_records(index=False)
+                print("Rows in dataframe: ", row)
                 self.df_screen = MainApp.get_running_app().root.get_screen('dashboard').ids.screen_manager.get_screen('upload_from_csv')
 
                 col = [(x, dp(60)) for x in col]
@@ -524,6 +527,8 @@ class MainApp(MDApp):
 
     def analyze_thread(self, obj):
         dashbrd = MainApp.get_running_app().root.get_screen('dashboard')
+        if dashbrd.ids.table_button_layout:
+            dashbrd.ids.table_button_layout.clear_widgets()
         self.dataframemsg = MDLabel(text="                                        Analysing... Please wait", font_size="12sp")
         dashbrd.ids.table_button_layout.add_widget(self.dataframemsg)
         Clock.schedule_once(lambda x: self.analyze(obj), 0)
@@ -674,6 +679,35 @@ class MainApp(MDApp):
             df_forecast = pd.DataFrame({'Date': np.array(forecast_dates), 'Rainfall Amount (mm)': y_pred_future})
             df_forecast['Date'] = pd.to_datetime(df_forecast['Date'], format="%Y-%m-%d")
 
+            res_forecast = df_forecast.copy()
+            res_forecast.columns = ['Date', 'Forecasted Rainfall Amount (mm)']
+            res_forecast['Date'] = pd.to_datetime(res_forecast['Date'], format="%Y-%m-%d")
+            col = list(res_forecast.columns)
+            print("Columns: %s" % col)
+            row = res_forecast.to_records(index=False)
+            print(res_forecast.head())
+
+            # for i in row:
+                # i[0] = datetime.datetime.strptime(i[0], format='%Y-%m-%d').strftime('%Y-%m-%d')
+                # print("Date values: ", i[0])
+            # print("Rows of records: %s" % row)
+            col = [(x, dp(60)) for x in col]
+            table = MDDataTable(
+                pos_hint={"center_x": .5, "center_y": .5},
+                size_hint=(1, .9),
+                # height = '490dp',
+                column_data=col,
+                row_data=row,
+                use_pagination=True,
+                rows_num=10,
+                pagination_menu_height='240dp',
+            )
+
+            print("\n================================")
+            print("FORECAST FINAL RESULT: ", df_forecast)
+            self.train_screen = MainApp.get_running_app().root.get_screen('dashboard').ids.prediction_result_screen  
+            self.train_screen.add_widget(table)
+            
             original = df[['Date', 'Rainfall Amount (mm)']]
             original['Date'] = pd.to_datetime(original['Date'], format="%Y-%m-%d")
             original = original.loc[original['Date'] >= '2014-05-01']
@@ -690,6 +724,8 @@ class MainApp(MDApp):
             plt.legend(loc='upper right', handles=[plt1, plt2])
             
             self.plot_screen.add_widget(FigureCanvasKivyAgg(plt.gcf()), index=1)
+
+
 
             MainApp.get_running_app().root.get_screen('dashboard').ids.screen_manager.get_screen('upload_from_csv').manager.current = "display_graph"
         Window.size = (1000, 600)
