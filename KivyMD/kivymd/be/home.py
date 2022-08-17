@@ -24,11 +24,13 @@ from kivymd.uix.button import MDFlatButton, MDRectangleFlatButton
 from kivymd.uix.datatables import MDDataTable
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.progressbar import ProgressBar
+from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.scrollview import ScrollView
-from kivymd.uix.list import MDList
+from kivy.uix.button import Button
+from kivymd.uix.list import MDList, OneLineListItem
 from kivymd.uix.label import MDLabel
 import numpy as np
 # from numpy import size, spacing
@@ -397,7 +399,7 @@ class MainApp(MDApp):
         dashbd = MainApp.get_running_app().root.get_screen('dashboard')
         if dashbd.ids.filechooser_lyt:
             dashbd.ids.filechooser_lyt.clear_widgets()
-        self.filechoosermsg = MDLabel(text="Please wait while loading the file...", font_size="12sp", pos_hint={"x":.3, "y":.4})
+        self.filechoosermsg = MDLabel(text="Please wait while loading the file...", font_size="12sp", color = (1, 1, 0, 1), pos_hint={"x":.3, "y":.4})
         dashbd.ids['filechooser_msg'] = weakref.ref(self.filechoosermsg)
         dashbd.ids.filechooser_lyt.add_widget(self.filechoosermsg)
         Clock.schedule_once(lambda x: self.showdataframe(filename), 0)            
@@ -489,7 +491,7 @@ class MainApp(MDApp):
                 print(csverr)
                 self.alert(csverr)
 
-    def doanalysis(self):
+    def doanalysis(self, csv=None):
         # get user
         get_user = shelve.open('get_user')
         user = get_user['user']
@@ -498,6 +500,8 @@ class MainApp(MDApp):
         sql = f"SELECT filepath FROM data_frame WHERE userid = '{userid}' ORDER BY created DESC LIMIT 1"
         self.cursor.execute(sql)
         csv_path = self.cursor.fetchall()[0][0]
+        if csv != None:
+            csv_path = csv
         print("CSV FILE PATH IN ANALYSE", csv_path)
         # check if result exist then create dataframe
         if csv_path and Path(csv_path).is_file():
@@ -529,7 +533,8 @@ class MainApp(MDApp):
         dashbrd = MainApp.get_running_app().root.get_screen('dashboard')
         if dashbrd.ids.table_button_layout:
             dashbrd.ids.table_button_layout.clear_widgets()
-        self.dataframemsg = MDLabel(text="                                        Analysing... Please wait", font_size="12sp")
+        self.dataframemsg = MDLabel(text="                                        Analysing... Please wait", color = (1, 1, 0, 1), font_size="12sp")
+        MainApp.get_running_app().root.get_screen('dashboard').ids['table_button_layout_msg'] = weakref.ref(self.dataframemsg)
         dashbrd.ids.table_button_layout.add_widget(self.dataframemsg)
         Clock.schedule_once(lambda x: self.analyze(obj), 0)
 
@@ -678,8 +683,8 @@ class MainApp(MDApp):
 
             df_forecast = pd.DataFrame({'Date': np.array(forecast_dates), 'Rainfall Amount (mm)': y_pred_future})
             df_forecast['Date'] = pd.to_datetime(df_forecast['Date'], format="%Y-%m-%d")
-
             res_forecast = df_forecast.copy()
+            MainApp.get_running_app().root.get_screen('dashboard').ids.prediction_result.text += f' (for {n_days_for_prediction} Days)'
             res_forecast.columns = ['Date', 'Forecasted Rainfall Amount (mm)']
             res_forecast['Date'] = pd.to_datetime(res_forecast['Date'], format="%Y-%m-%d")
             col = list(res_forecast.columns)
@@ -725,24 +730,47 @@ class MainApp(MDApp):
             
             self.plot_screen.add_widget(FigureCanvasKivyAgg(plt.gcf()), index=1)
 
-
-
             MainApp.get_running_app().root.get_screen('dashboard').ids.screen_manager.get_screen('upload_from_csv').manager.current = "display_graph"
         Window.size = (1000, 600)
 
-    def pop(self, filename):
-        self.progress_bar.value = 1
-        self.popup.bind(on_open=self.puopen(filename))
-        self.popup.open()
+    def showallfiles(self, obj):
+        print("BUTTON TEXT: " + obj.text)
+        allfiles = MainApp.get_running_app().root.get_screen('dashboard').ids.load_all_my_files
 
-    # To continuously increasing the value of pb.
-    def next(self, filename):
-        if self.progress_bar.value >= 100:
-            self.showdataframe(filename)
-        self.progress_bar.value += 1
+        get_user = shelve.open('get_user')
+        userid = get_user['user'][1]
+        if obj.text.strip() == "My Files":
+            sql = f"SELECT filepath FROM data_frame WHERE userid = '{userid}' ORDER BY created DESC"
+        elif obj.text.strip() == "Recent":
+            sql = f"SELECT filepath FROM data_frame WHERE userid = '{userid}' ORDER BY created DESC LIMIT 5"
 
-    def puopen(self, filename):
-        Clock.schedule_interval(self.next(filename), 100)
+        self.cursor.execute(sql)
+        csv = self.cursor.fetchall()
+        item = [OneLineListItem(text=os.path.split(item[0])[-1], on_press = self.load_single_plot) for item in csv]
+        layout = GridLayout(cols=1, spacing=1, size_hint_y=None)
+        # Make sure the height is such that there is something to scroll.
+        layout.bind(minimum_height=layout.setter('height'))
+        datalist = ScrollView()
+        for i in item:
+            layout.add_widget(i)
+        datalist.add_widget(layout)
+        allfiles.clear_widgets()
+        allfiles.add_widget(datalist)
+
+        MainApp.get_running_app().root.get_screen('dashboard').ids.screen_manager.current = "my_files"
+
+    def load_single_plot(self, obj):
+        print("SELECTED OBJECT: ", obj.text)
+        csv_path = os.path.join(os.path.split(os.path.dirname(__file__))[0], f'excelfiles\{obj.text}')
+        print("CSV PATH: ", csv_path)
+        
+        self.displayfiles = MainApp.get_running_app().root.get_screen('dashboard').ids.display_files
+        plt.cla()
+        self.displayfiles.clear_widgets()
+        self.doanalysis(csv_path)
+        self.displayfiles.add_widget(FigureCanvasKivyAgg(plt.gcf()))
+        MainApp.get_running_app().root.get_screen('dashboard').ids.screen_manager.current = 'display_files'
+        
 
 
 if __name__ == "__main__":

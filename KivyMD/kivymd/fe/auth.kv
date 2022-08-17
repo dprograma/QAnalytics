@@ -312,21 +312,24 @@ AuthManager:
             Screen:
                 name: "my_files"
                 BoxLayout:
+                    id: load_all_my_files
                     orientation: "vertical"
                     padding: 50
-                    FileChooserIconView:
-                        id: load_all_my_files
-                        rootpath: 'excelfiles'  
+                    # FileChooserIconView:
+                    #     id: load_all_my_files
+                    #     rootpath: 'excelfiles'  
                         # on_selection:
                         #     app.showallfiles
 
             Screen:
                 name: "recents"
                 BoxLayout:
+                    id: recent_files
                     orientation: "vertical"
                     padding: 50
-                    FileChooserIconView:
-                        rootpath: 'excelfiles' 
+                    # FileChooserIconView:
+                    #     id: recent_files
+                    #     rootpath: 'excelfiles' 
 
             Screen:
                 name: "upload_from_csv"
@@ -359,7 +362,14 @@ AuthManager:
                         id: prediction_result
                         BoxLayout:
                             orientation:'vertical'
-                            id: prediction_result_screen               
+                            id: prediction_result_screen 
+            Screen:
+                name: "display_files"
+                BoxLayout:
+                    id: display_files
+                    orientation: "vertical"
+                    padding: 50
+
 
     MDNavigationDrawer:
         id: nav_drawer
@@ -395,17 +405,20 @@ AuthManager:
                         IconLeftWidget:
                             icon: 'view-dashboard'
                     OneLineListItem:
+                        id: my_files_id
                         text: '         My Files'
                         on_press: 
-                            screen_manager.current = "my_files"
-                            # app.showallfiles()
+                            # screen_manager.current = "my_files"
+                            app.showallfiles(my_files_id)
                         IconLeftWidget:
                             icon: 'file'
 
                     OneLineListItem: 
+                        id: my_recents_id
                         text: '         Recent'
                         on_press: 
-                            screen_manager.current = "recents"
+                            # screen_manager.current = "recents"
+                            app.showallfiles(my_recents_id)
                         IconLeftWidget:
                             icon: 'history'
                     OneLineListItem:
